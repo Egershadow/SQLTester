@@ -1,0 +1,9 @@
+{
+  "port" : 1337,
+  "mysql": {
+    "username": "vadimvoytenko",
+    "password": "humandetector",
+    "db": "sqltester"
+  },
+  "secret": "humandetectorprivatekey228"
+}
