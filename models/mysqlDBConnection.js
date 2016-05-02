@@ -1,9 +1,5 @@
-var Sequelize = require('sequelize');
-var config    = require('../libs/config');
-
-//logging
-var intel           = require('intel');
-var log             = require('../libs/log')('console', intel.DEBUG);
+var Sequelize       = require('sequelize');
+var config          = require('../libs/config');
 
 // initialize database connection
 var sequelize = new Sequelize(
@@ -21,11 +17,10 @@ var sequelize = new Sequelize(
         }
 });
 
-var User   = sequelize.import('./user');
-var Role   = sequelize.import('./role');
-var UserHasRole   = sequelize.import('./user_has_role');
+var User            = sequelize.import('./user');
+var Role            = sequelize.import('./role');
+var UserHasRole     = sequelize.import('./user_has_role');
 
-//
 //relations
 User.belongsToMany(Role, {
     as: 'users',
