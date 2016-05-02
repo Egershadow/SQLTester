@@ -6,13 +6,13 @@ var config          = require('../libs/config');
 var crypto          = require('crypto');
 var jwt             = require('jsonwebtoken');
 
-// database
-var mysqlDBConnection = require('../models/mysqlDBConnection');
-var User              = mysqlDBConnection.import('../models/user');
-
 //logging
 var intel           = require('intel');
 var log             = require('../libs/log')('console', intel.DEBUG);
+
+// database
+var ServerApplication = require('../libs/server-application');
+var User              = ServerApplication.defaultConnection.import('../models/user');
 
 var sendResponse     = require('../libs/response-callback');
 
