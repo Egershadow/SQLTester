@@ -24,25 +24,27 @@ router.post('/signin', function(req, res) {
         email: req.body.email
     }
     }).then(function(user) {
-
+        if(!user) {
+            log.info('Authentication failed. User not found');
+            sendResponse(res, 400, 'User not found');
+            return;
+        }
         // check if password matches
         var hash = crypto
             .createHash("sha1")
             .update(req.body.password)
             .digest('hex');
         if (user.password != hash) {
-            log.info('Authentication failed. Wrong password.');
-            sendError(res, 400, 'Wrong password');
+            log.info('Authentication failed. Wrong password');
+            sendResponse(res, 400, 'Wrong password');
             return;
         }
-
         // if user is found and password is right
         var tokenString = jwt.sign({
             idUser: user.idUser
         }, config.get('secret'), {
             expiresIn: 60*60 // expires in 60 minutes
         });
-
         res.code = 200;
         res.json({
             token: tokenString
@@ -53,33 +55,21 @@ router.post('/signin', function(req, res) {
     });
 });
 
-router.post('/signin/refresh', function(req, res) {
+router.post('/refresh', function(req, res) {
     var token = req.headers['x-access-token'];
     jwt.verify(token, config.get('secret'), function(err, decoded) {
         if (err) {
             log.error('Internal error(%d): %s', err.code, err.message);
-            sendError(res, 400, 'Token prolongation failed')
+            sendResponse(res, 400, 'Token prolongation failed');
             return;
         }
 
-        var tokenString = ''
-        if(decoded.idUser != undefined) {
-
-            log.info('Refreshing token for user with id %s', decoded.idUser)
-            tokenString = jwt.sign({
-                idUser: decoded.idUser
-            }, config.get('secret'), {
-                expiresIn: 60*60 // expires in 60 minutes
-            });
-        } else {
-
-            log.info('Refreshing token for detector with id %s',decoded.idDetector)
-            tokenString = jwt.sign({
-                idDetector: decoded.idDetector
-            }, config.get('secret'), {
-                expiresIn: 60*60 // expires in 60 minutes
-            });
-        }
+        log.info('Refreshing token for user with id %s', decoded.idUser);
+        var tokenString = jwt.sign({
+            idUser: decoded.idUser
+        }, config.get('secret'), {
+            expiresIn: 60*60 // expires in 60 minutes
+        });
         res.code = 200;
         res.json({
             token: tokenString
@@ -97,8 +87,8 @@ router.post('/signup',  function(req, res) {
 
         //check if user already exists
         if(user) {
-            log.info('User with email %s already exists', req.body.email)
-            sendError(res, 400, 'User with this email already exists')
+            log.info('User with email %s already exists', req.body.email);
+            sendResponse(res, 400, 'User with this email already exists');
             return;
         }
         var hash = crypto
@@ -116,16 +106,18 @@ router.post('/signup',  function(req, res) {
 
             log.info('User with email %s successfully created!', user.email);
             res.code = 200;
-            res.json(user);
+            res.json({
+                idUser : user.idUser
+            });
         }, function(err) {
             log.error('Internal error when creating user(%d): %s', err.code, err.message);
 
-            sendError(res, 500, 'Server error')
+            sendResponse(res, 500, 'Server error')
         });
     }, function(err) {
         log.error('Internal error(%d): %s', err.code, err.message);
 
-        sendError(res, 500, 'Server error')
+        sendResponse(res, 500, 'Server error')
     });
 
 });

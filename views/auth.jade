@@ -1,0 +1,14 @@
+extend layout
+block header
+    div(class="nav nav-pills")
+        h2 Sign in SQLTester
+        h5 Take credentials from your teacher.
+block body
+    div(ng-app="Auth", ng-controller="AuthorizationController as auth")
+        div(ng-view)
+    script(src="/js/lib/angular/angular.min.js")
+    script(src="/js/lib/angular/angular-route.min.js")
+    script(src="/js/lib/angular/angular-cookies.min.js")
+    script(src="/js/auth/auth.js")
+    script(src="/js/auth/services/user-service.js")
+    script(src="/js/auth/controllers/authorization-controller.js")

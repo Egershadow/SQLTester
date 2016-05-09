@@ -33,6 +33,7 @@ app.use(stylus.middleware(
     }
 ));
 app.use(express.static(__dirname + '/public'));
+//app.use(express.static(__dirname + '/views'));
 
 // used to create, sign, and verify tokens
 var port = process.env.PORT || 8080;
@@ -43,7 +44,7 @@ ConnectionFabric.establishDefaultConnection(function(sequelize) {
     ServerApplication.defaultConnection = sequelize;
     app.listen(config.get('port'), function () {
         log.info('Express server listening on port %s', config.get('port'))
-    })
+    });
     //routers
     var routers = require('./routes/routers');
     app.use('/', routers);

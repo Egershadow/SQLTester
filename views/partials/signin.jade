@@ -1,0 +1,12 @@
+div(class="panel panel-default")
+    form(name="signInForm")
+        div(class="form-group")
+            label(class="col-sm-2 control-label", id="signInEmailLabel") Email
+            input(type="email", class="form-control", placeholder="Email", ng-model="auth.user.email" required)
+        div(class="form-group")
+            label(class="col-sm-2 control-label", id="signInPasswordLabel") Password
+            input(type="password", class="form-control", placeholder="Password", ng-model="auth.user.password" ng-pattern="/^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W]).*$/" required)
+        div(class="form-group")
+            div(class="alert alert-danger fade in", ng-show="auth.signInResultMessage != ''", ng-bind="'Error: ' + auth.signInResultMessage")
+        div(class="form-group" ng-style="auth.signInResultMessage == '' ? {'margin-top': '0px'} : {'margin-top': '-15px'}")
+            button(class="btn btn-default", ng-click="auth.signin()", id="signInButton") Sign In

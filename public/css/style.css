@@ -108,36 +108,42 @@ body {
   background-color: #faf9f0;
   color: #444;
 }
-.navbar.navbar-default.navbar-fixed-top {
-  background-color: #fa5b4d;
+.nav.nav-pills {
+  background-color: #707070;
   font-size: 25px;
+  color: #fff;
   text-align: center;
   height: 150px;
 }
-.container {
-  width: 800px;
-  margin: 50px auto;
-  overflow: hidden;
-}
-.main-content {
-  float: left;
-  margin-left: 50px;
-  margin-top: 200px;
+.panel.panel-default {
   width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 8%;
+  margin-bottom: auto;
 }
-.main-content p {
-  margin-bottom: 20px;
+.form-group {
+  margin-left: 20px;
+  margin-right: 20px;
 }
-.sidebar {
-  float: right;
-  width: 200px;
+#signInEmailLabel {
+  margin-top: 20px;
 }
-p {
-  line-height: 1.8;
+.control-label {
+  margin-left: -15px;
+  margin-right: -15px;
+}
+#signInButton {
+  margin-top: 10px;
+  width: 100%;
+  height: 50px;
+  color: #fff;
+  font-size: 16px;
+  background-color: rgba(9,115,14,0.43);
 }
 footer {
   text-align: center;
-  width: 1000px;
+  width: 90%;
   margin: 50px auto;
   border-top: 1px dotted #ccc;
   padding-top: 5px;
