@@ -10,9 +10,5 @@ module.exports = function(sequelize, DataTypes) {
 
         //encrypted password
         password: {type: DataTypes.STRING(512), allowNull: false, unique: false}
-    },
-        {
-            // don't add the timestamp attributes (updatedAt, createdAt)
-            timestamps: false
-        })
+    })
 };

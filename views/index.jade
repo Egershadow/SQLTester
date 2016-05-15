@@ -1,8 +1,14 @@
 extend layout
 block header
-    .navbar.navbar-default.navbar-fixed-top
-        h1 SQL Tester
-        h5 Test your sql knowledge
+    div(class="nav nav-pills", id="homeNavigationBar")
+        h2 Sign in SQLTester
+        h5 Take credentials from your teacher.
 block body
-    .container
+    div(ng-app="Auth", ng-controller="AuthorizationController as auth")
         div(ng-view)
+    script(src="/js/lib/angular/angular.min.js")
+    script(src="/js/lib/angular/angular-route.min.js")
+    script(src="/js/lib/angular/angular-cookies.min.js")
+    script(src="/js/auth/auth.js")
+    script(src="/js/auth/services/user-service.js")
+    script(src="/js/auth/controllers/authorization-controller.js")

@@ -12,10 +12,18 @@ connectionFabric.establishDefaultConnection = function (success, failure) {
         emptyQuerisArray,
         function (sequelize) {
             //model definition
-            var User            = sequelize.import('../models/user');
-            var Role            = sequelize.import('../models/role');
-            var UserHasRole     = sequelize.import('../models/user_has_role');
+            var User                = sequelize.import('../models/user');
+            var Role                = sequelize.import('../models/role');
+            var UserHasRole         = sequelize.import('../models/user_has_role');
+            var Topic               = sequelize.import('../models/topic');
+            var Question            = sequelize.import('../models/question');
+            var TopicHasQuestion    = sequelize.import('../models/topic_has_question');
+            var Test                = sequelize.import('../models/test');
+            var TestHasQuestion     = sequelize.import('../models/test_has_question');
+            var Group               = sequelize.import('../models/group');
+            var UserPassedTest      = sequelize.import('../models/user_passed_test');
             //definition of relations between models
+            //user has role relationship
             User.belongsToMany(Role, {
                 as: 'users',
                 through: UserHasRole,
@@ -26,6 +34,43 @@ connectionFabric.establishDefaultConnection = function (success, failure) {
                 through: UserHasRole,
                 foreignKey: 'idRole'
             });
+            //topic has question relationship
+            Topic.belongsToMany(Question, {
+                as: 'topics',
+                through: TopicHasQuestion,
+                foreignKey: 'idTopic'
+            });
+            Question.belongsToMany(Topic, {
+                as: 'questions',
+                through: TopicHasQuestion,
+                foreignKey: 'idQuestion'
+            });
+            //test has question relationship
+            Test.belongsToMany(Question, {
+                as: 'tests',
+                through: TestHasQuestion,
+                foreignKey: 'idTopic'
+            });
+            Question.belongsToMany(Test, {
+                as: 'questions',
+                through: TestHasQuestion,
+                foreignKey: 'idQuestion'
+            });
+            //group relationship
+            Group.hasMany(User, {
+                as: 'groups',
+                foreignKey: 'group'
+            });
+            //user passed test
+            UserPassedTest.hasMany(TestHasQuestion, {
+                as: 'testHasQuestions',
+                foreignKey: 'idTestHasQuestion'
+            });
+            UserPassedTest.hasMany(User, {
+                as: 'users',
+                foreignKey: 'idUser'
+            });
+
             sequelize.authenticate().then(function(err) {
                 if (!err) {
                     sequelize.sync().then(function() {

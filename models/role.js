@@ -7,9 +7,5 @@ module.exports = function(sequelize, DataTypes) {
 
             //role name
             roleName: {type: DataTypes.STRING(128), allowNull: false, unique: true}
-        },
-        {
-            // don't add the timestamp attributes (updatedAt, createdAt)
-            timestamps: false
         })
 };
