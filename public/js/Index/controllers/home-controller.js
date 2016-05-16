@@ -1,44 +1,24 @@
-angular.module('Auth').controller('AuthorizationController', AuthorizationController);
 
-AuthorizationController.$inject = ['$window', 'userService', '$location'];
+angular.module('Index')
+    .controller('HomeController', HomeController);
 
-function AuthorizationController ($window, userService, $location) {
-    var authController = this;
+HomeController.$inject = ['testsService', '$location', '$filter'];
 
-    authController.user = {
-        email : 'vadym.voitenko@nure.com',
-        password : 'Password11'
-    };
-    authController.signInResultMessage = '';
+function HomeController (testService, $location, $filter) {
+    var homeController = this;
 
-    authController.signin = function () {
-        authController.signInResultMessage = authController.getValidationErrorMessage(authController.user.email, authController.user.password);
-        if(authController.signInResultMessage != '') {
-            return;
-        }
-        userService.signIn(authController.user, function(accessToken) {
-            $window.location.href = '/';
-        }, function(response) {
-            authController.signInResultMessage = response.data.message;
-        });
+    homeController.tests = [{testName:"test1", createdAt:Date.now()}, {testName:"test2", createdAt:Date.now()}];
+
+    homeController.getFormattedDate = function (date) {
+        return $filter('date')(date, "dd.MM.yyyy H:mm");
     };
 
-    authController.singnout = function () {
-        userService.signOut();
-    };
-
-    authController.getValidationErrorMessage = function (email, password) {
-        var emailRegex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i;
-        var foundEmail = emailRegex.exec(email);
-        if(!foundEmail) {
-            return 'Invalid email format';
-        }
-
-        var passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
-        var foundPassword = passwordRegex.exec(password);
-        if(!foundPassword) {
-            return 'Invalid password format';
-        }
-        return '';
+    homeController.startTest = function (test) {
+//      $location.path('/test/%s/question/', test.idTest) = '/';
+//        userService.signIn(authController.user, function(accessToken) {
+//            $location.path('/test/%s/question/', test.idTest) = '/';
+//        }, function(response) {
+//            authController.signInResultMessage = response.data.message;
+//        });
     };
 }

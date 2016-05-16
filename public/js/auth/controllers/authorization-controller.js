@@ -1,8 +1,8 @@
 angular.module('Auth').controller('AuthorizationController', AuthorizationController);
 
-AuthorizationController.$inject = ['$window', 'userService', '$location'];
+AuthorizationController.$inject = ['$window', 'userService'];
 
-function AuthorizationController ($window, userService, $location) {
+function AuthorizationController ($window, userService) {
     var authController = this;
 
     authController.user = {

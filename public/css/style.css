@@ -103,7 +103,7 @@ a img {
  * Store the main color and
  * background color as variables
  */
-body {
+content {
   font-family: 'Georgia';
   background-color: #faf9f0;
   color: #444;
@@ -113,7 +113,12 @@ body {
   font-size: 25px;
   color: #fff;
   text-align: center;
+}
+#authNavigationBar {
   height: 150px;
+}
+#homeNavigationBar {
+  height: 100px;
 }
 .panel.panel-default {
   width: 600px;
@@ -140,6 +145,31 @@ body {
   color: #fff;
   font-size: 16px;
   background-color: rgba(9,115,14,0.43);
+}
+#testNameParagraph {
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: 15px;
+}
+#testDateParagraph {
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-right: 15px;
+  float: right;
+}
+#startTestButton {
+  margin-top: -4px;
+  margin-bottom: auto;
+  float: right;
+  margin-right: 0px;
+  height: 30px;
+  width: 75px;
+}
+#testsListContainer {
+  margin-top: 100px;
+  width: 500px;
+  margin-right: auto;
+  margin-left: auto;
 }
 footer {
   text-align: center;

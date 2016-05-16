@@ -1,9 +1,8 @@
 extend layout
-block header
+block content
     div(class="nav nav-pills", id="authNavigationBar")
         h2 Sign in SQLTester
         h5 Take credentials from your teacher.
-block body
     div(ng-app="Auth", ng-controller="AuthorizationController as auth")
         div(ng-view)
     script(src="/js/lib/angular/angular.min.js")
