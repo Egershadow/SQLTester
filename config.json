@@ -5,5 +5,5 @@
     "password": "humandetector",
     "db": "sqltester"
   },
-  "secret": "humandetectorprivatekey228"
+  "secret": "sqltesterprivatekey228"
 }

@@ -22,6 +22,7 @@ connectionFabric.establishDefaultConnection = function (success, failure) {
             var TestHasQuestion     = sequelize.import('../models/test_has_question');
             var Group               = sequelize.import('../models/group');
             var UserPassedTest      = sequelize.import('../models/user_passed_test');
+            var GroupHasTest        = sequelize.import('../models/group_has_test');
             //definition of relations between models
             //user has role relationship
             User.belongsToMany(Role, {
@@ -49,7 +50,7 @@ connectionFabric.establishDefaultConnection = function (success, failure) {
             Test.belongsToMany(Question, {
                 as: 'tests',
                 through: TestHasQuestion,
-                foreignKey: 'idTopic'
+                foreignKey: 'idTest'
             });
             Question.belongsToMany(Test, {
                 as: 'questions',
@@ -61,16 +62,26 @@ connectionFabric.establishDefaultConnection = function (success, failure) {
                 as: 'groups',
                 foreignKey: 'group'
             });
-            //user passed test
+            //user passed test relationship
             UserPassedTest.hasMany(TestHasQuestion, {
                 as: 'testHasQuestions',
                 foreignKey: 'idTestHasQuestion'
             });
-            UserPassedTest.hasMany(User, {
-                as: 'users',
-                foreignKey: 'idUser'
+            User.hasMany(UserPassedTest, {
+                as: 'userPassedTests',
+                foreignKey: 'idUserPassedTest'
             });
-
+            //group has test relationship
+            Group.belongsToMany(Test, {
+                as: 'groups',
+                through: GroupHasTest,
+                foreignKey: 'idGroup'
+            });
+            Test.belongsToMany(Group, {
+                as: 'tests',
+                through: GroupHasTest,
+                foreignKey: 'idTest'
+            });
             sequelize.authenticate().then(function(err) {
                 if (!err) {
                     sequelize.sync().then(function() {

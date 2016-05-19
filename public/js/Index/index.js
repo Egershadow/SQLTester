@@ -1,5 +1,5 @@
 
-angular.module('Index', ['ngRoute', 'ngCookies'])
+angular.module('Index', ['ngRoute', 'ngCookies', 'Auth'])
     .config(['$routeProvider', function($routeProvider) {
         // route for the home page
         $routeProvider

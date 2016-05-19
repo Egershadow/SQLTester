@@ -3,6 +3,7 @@ var router = express.Router();
 
 var jwt              = require('jsonwebtoken');
 var sendResponse     = require('../libs/response-callback');
+var config           = require('../libs/config');
 
 var auth = require('./auth');
 router.use('/auth', auth);
@@ -27,6 +28,12 @@ router.use(function(req, res, next) {
         sendResponse(res, 400, 'Token not provided');
     }
 });
+
+var groups = require('./groups');
+router.use('/groups', groups);
+
+var users = require('./users');
+router.use('/users', users);
 
 
 module.exports = router;

@@ -20,10 +20,10 @@ var sendResponse     = require('../libs/response-callback');
 router.post('/signin', function(req, res) {
 
     // find user
-    User.findOne({ where:
-    {
-        email: req.body.email
-    }
+    User.findOne({
+        where: {
+            email: req.body.email
+        }
     }).then(function(user) {
         if(!user) {
             log.info('Authentication failed. User not found');
@@ -36,6 +36,7 @@ router.post('/signin', function(req, res) {
             .update(req.body.password)
             .digest('hex');
         if (user.password != hash) {
+        //if (user.password != req.body.password) {
             log.info('Authentication failed. Wrong password');
             sendResponse(res, 400, 'Wrong password');
             return;
@@ -46,9 +47,25 @@ router.post('/signin', function(req, res) {
         }, config.get('secret'), {
             expiresIn: 60*60 // expires in 60 minutes
         });
-        res.code = 200;
-        res.json({
-            token: tokenString
+        //get user profile
+        User.findById(user.idUser).then(function(user) {
+            if(!user) {
+                sendResponse(res, 400, 'User with passed id not found');
+            } else {
+                res.code = 200;
+                res.json({
+                    token: tokenString,
+                    user : {
+                        idUser : user.idUser,
+                        email : user.email,
+                        username : user.username,
+                        idGroup : user.group
+                    }
+                });
+            }
+        }, function(err) {
+            log.error('Internal error(%d): %s', err.code, err.message);
+            sendResponse(res, 500, 'Server error')
         });
     }, function(err) {
         log.error('Internal error(%d): %s', err.code, err.message);
@@ -76,7 +93,7 @@ router.post('/refresh', function(req, res) {
             token: tokenString
         });
     });
-})
+});
 
 router.post('/signup',  function(req, res) {
 
@@ -101,7 +118,8 @@ router.post('/signup',  function(req, res) {
         User.create(
             {
                 email: req.body.email,
-                password: hash
+                password: hash,
+                username: req.body.username
 
             }).then(function (user) {
 

@@ -6,8 +6,8 @@ function AuthorizationController ($window, userService) {
     var authController = this;
 
     authController.user = {
-        email : 'vadym.voitenko@nure.com',
-        password : 'Password11'
+        email : 'vadym.voitenko@nure.ua',
+        password : 'password11'
     };
     authController.signInResultMessage = '';
 
@@ -16,6 +16,7 @@ function AuthorizationController ($window, userService) {
         if(authController.signInResultMessage != '') {
             return;
         }
+        //getting of user profile
         userService.signIn(authController.user, function(accessToken) {
             $window.location.href = '/';
         }, function(response) {
@@ -34,7 +35,7 @@ function AuthorizationController ($window, userService) {
             return 'Invalid email format';
         }
 
-        var passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
+        var passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[a-z])[0-9a-zA-Z]{8,}$/;
         var foundPassword = passwordRegex.exec(password);
         if(!foundPassword) {
             return 'Invalid password format';
