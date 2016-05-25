@@ -1,7 +1,6 @@
 var ServerApplication       = require('../libs/server-application');
 var ConnectionFabric        = require('../libs/connection-fabric');
 var config                  = require('../libs/config');
-var Sequelize               = require('sequelize');
 var async                   = require('async');
 
 //logging
@@ -141,6 +140,13 @@ module.exports.calculateTestResult = function (rawTestDate, result) {
 
         var parsedKeyWords = testInfo.question.keyWords.split(',');
 
+        var len = parsedKeyWords.length, i;
+
+        for(i = 0; i < len; i++ )
+            parsedKeyWords[i] && parsedKeyWords.push(parsedKeyWords[i]);  // copy non-empty values to the end of the array
+
+        parsedKeyWords.splice(0 , len);
+
         for (var keyWord in parsedKeyWords) {
             if (parsedKeyWords.hasOwnProperty(keyWord)) {
                 if(testInfo.userAnsweredQuestion.answerRequest.indexOf(parsedKeyWords[keyWord]) == -1) {
@@ -151,31 +157,62 @@ module.exports.calculateTestResult = function (rawTestDate, result) {
         }
         if(contains) {
 
-            //query chainer performes multiple requests and returns array of results
-            var chain = new Sequelize.Utils.QueryChainer();
-            chain
-                .add(ServerApplication.subjectDBs[testInfo.question.idSubjectDB]
-                    .connection.query(testInfo.userAnsweredQuestion.answerRequest))
-                .add(ServerApplication.subjectDBs[testInfo.question.idSubjectDB]
-                    .connection.query(testInfo.question.correctRequest))
-                .run()
-                .success(function(results) {
+            //performing multiple requests and returns array of results
+            async.series([
+                    function(internalCallback){
+                        ServerApplication.subjectDBs[testInfo.question.idSubjectDB]
+                            .connection.query(testInfo.userAnsweredQuestion.answerRequest).then(function (results) {
+                            internalCallback(null, results);
+                        });
+                    },
+                    function(internalCallback){
+                        ServerApplication.subjectDBs[testInfo.question.idSubjectDB]
+                            .connection.query(testInfo.question.correctRequest).then(function (results) {
+                            internalCallback(null, results);
+                        });
+                    }
+                ],
+                function(err, results){
 
+                    if(err) {
+                        log.error('Query chainer requests failed:', err);
+                        callback();
+                        return;
+                    }
                     //compare results
 
                     //TODO: Implement comparation logic
                     resultValue += rawTestDate.testHasQuestion.weight;
-
                     callback();
-                }).error(function(err) {
-
-                log.error('Query chainer requests failed:', err);
-                callback();
-            });
+                });
         }
     }, function () {
 
         result(resultValue);
+    });
+};
+
+module.exports.getQuestionsOfTest = function (idTest, success, failure) {
+
+    var Question                = ConnectionFabric.defaultConnection.import('../models/question');
+    Question.findAll({
+        where: {
+            idTest : idTest
+        }
+    }).then(function(questions) {
+
+        var questionData = [];
+        for (var questionIndex in questions) {
+            if (questions.hasOwnProperty(questionIndex)) {
+                questionData.push({
+                    questionText : questions[questionIndex].questionText,
+                    idQuestion : questions[questionIndex].idQuestion
+                });
+            }
+        }
+        success(questionData);
+    }, function(err) {
+        failure(err);
     });
 };
 

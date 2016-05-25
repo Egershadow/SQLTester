@@ -4,7 +4,7 @@ var SocketService       = require('../services/socket-service');
 var async               = require('async');
 
 
-module.exports.networkConnections = [];
+module.exports.networkConnections = {};
 module.exports.subjectDBs = {};
 
 module.exports.startListenPollingSocket = function () {

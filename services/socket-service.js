@@ -26,33 +26,54 @@ module.exports.onDisconnect = function () {
 
 module.exports.onStartTest = function (socket, msg) {
 
-    TestService.getTimeForTest(msg.idTest, function (seconds) {
-        var testAttempt = {
-            idTest : msg.test.idTest,
-            idUser : msg.test.idUser,
-            startDate : new Date(),
-            timer : setTimeout(function() {
-                module.exports.finishTest(testAttempt.idUser, testAttempt.idTest, testAttempt.startDate, function (result) {
-                    socket.emit('testfinished', {
-                        result : result
+    TestService.getQuestionsOfTest(msg.idTest, function (questions) {
+        TestService.getTimeForTest(msg.idTest, function (seconds) {
+            var started = new Date();
+            var testAttempt = {
+                idTest : msg.test.idTest,
+                idUser : msg.test.idUser,
+                startDate : started,
+                timer : setTimeout(function() {
+                    module.exports.finishTest(testAttempt.idUser, testAttempt.idTest, testAttempt.startDate, function (result) {
+                        socket.emit('testfinished', {
+                            result : result
+                        });
+                    }, function (error) {
+                        socket.emit('testfinished', {
+                            error : error
+                        });
                     });
-                }, function (error) {
-                    socket.emit('testfinished', {
-                        error : error
-                    });
-                });
 
-            }, seconds * 1000)
-        };
-        ServerApplication.networkConnections.push(testAttempt);
-    }, function (err) {
-
+                }, seconds * 1000)
+            };
+            ServerApplication.networkConnections[socket.id.toString()] = testAttempt;
+            socket.emit('teststarted', {
+                started : started,
+                questions : questions
+            });
+        }, function (err) {
+        });
+    }, function(err) {
     });
-
 };
 
 module.exports.onEndTest = function (socket, msg) {
+    var testAttempt = ServerApplication.networkConnections[socket.id.toString()];
+    module.exports.finishTest(testAttempt.idUser, testAttempt.idTest, testAttempt.startDate, function (result) {
+        socket.emit('testfinished', {
+            result : result
+        });
 
+        //invalidating of timer
+        clearTimeout(testAttempt.timer);
+
+        //removing of old socket
+        delete ServerApplication.networkConnections[socket.id.toString()];
+    }, function (error) {
+        socket.emit('testfinished', {
+            error : error
+        });
+    });
 };
 
 module.exports.onAnswer = function (socket, msg) {

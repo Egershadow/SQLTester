@@ -130,12 +130,21 @@ module.exports.establishDefaultDBConnection = function (success, failure) {
 };
 
 module.exports.establishConnection = function (dbInfo, success, failure) {
+
+    var arr = dbInfo.queries.split(';');
+    var len = arr.length, i;
+
+    for(i = 0; i < len; i++ )
+        arr[i] && arr.push(arr[i]);  // copy non-empty values to the end of the array
+
+    arr.splice(0 , len);
+
     module.exports.initConnection(
         dbInfo.dbName,
         dbInfo.username,
         dbInfo.password,
         dbInfo.dbPath,
-        dbInfo.queries.split(';'),
+        arr,
         function (sequelize) {
             sequelize.authenticate().then(function(err) {
                 if (!err) {
@@ -165,50 +174,27 @@ module.exports.initConnection = function (dbname, username, password, dbpath, qu
     var currentIndex = 0;
     if(queries.length > 0) {
 
-        var chain = new Sequelize.Utils.QueryChainer();
+
+        //performing multiple requests and returns array of results
+
+        var funcArray = [];
+
         for (var queryIndex in queries) {
             if (queries.hasOwnProperty(queryIndex)) {
-                chain.add(sequelize.query(queries[queryIndex]))
+                var singleQuery = queries[queryIndex];
+                funcArray.push(module.exports.getFunc(sequelize, singleQuery));//sequelize.query(queries[queryIndex]))
             }
         }
-        chain.run()
-                    .success(function(results) {
-                        done(sequelize);
-                    }).error(function(err) {
 
-                    log.error('Query chainer requests failed:', err);
-                });
+        async.series(funcArray,
+            function(err){
 
-
-    //        //query chainer performes multiple requests and returns array of results
-    //        var chain = new Sequelize.Utils.QueryChainer();
-    //
-    //        chain
-    //            .add(ServerApplication.subjectDBs[testInfo.question.idSubjectDB]
-    //                .connection.query(testInfo.userAnsweredQuestion.answerRequest))
-    //            .add(ServerApplication.subjectDBs[testInfo.question.idSubjectDB]
-    //                .connection.query(testInfo.question.correctRequest))
-    //            .run()
-    //            .success(function(results) {
-    //
-    //                //compare results
-    //
-    //                //TODO: Implement comparation logic
-    //                resultValue += rawTestDate.testHasQuestion.weight;
-    //
-    //                callback();
-    //            }).error(function(err) {
-    //
-    //            log.error('Query chainer requests failed:', err);
-    //            callback();
-    //        });
-    //
-    //    }, function () {
-    //
-    //        result(resultValue);
-    //    });
-    //} else {
-    //    done(sequelize);
+                if(err) {
+                    log.error('Initial queries failed:', err);
+                    return;
+                }
+                done(sequelize);
+            });
     }
 };
 
@@ -221,6 +207,14 @@ module.exports.executeQuery = function executePassedQuery(sequelize, queries, cu
             executePassedQuery(sequelize, queries, currentIndex, done);
         }
     });
+};
+
+module.exports.getFunc = function getFunc(sequelize, singleQuery) {
+    return function(internalCallback) {
+            sequelize.query(singleQuery).then(function () {
+            internalCallback()
+        });
+    };
 };
 
 
