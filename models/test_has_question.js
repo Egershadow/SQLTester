@@ -5,7 +5,8 @@ module.exports = function(sequelize, DataTypes) {
         //primary key
         idTestHasQuestion: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
 
-        //sql request
-        correctRequest: {type: DataTypes.STRING(512), allowNull: false, unique: false}
+        //weight of question in test
+        weight: {type: DataTypes.REAL, allowNull: false, unique: false}
+
     })
 };

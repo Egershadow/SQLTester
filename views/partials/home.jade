@@ -1,11 +1,11 @@
 block header
     div(class="nav nav-pills", id="homeNavigationBar")
-        h2 Sign in SQLTester
-        h5 Take credentials from your teacher.
+        h2 Welcome to SQLTester
+        h5 See your history
 block body
     div(ng-controller="HomeController as homeCtrl", class="container", id="testsListContainer")
         ul(class="list-group")
-            li(class="list-group-item list-group-item-success", ng-repeat="test in homeCtrl.tests")
+            li(class="list-group-item", ng-repeat="test in homeCtrl.tests" ng-class="test.status == 'new' ? 'list-group-item-info' : test.status == 'passed' ? 'list-group-item-success' : 'list-group-item-danger'")
                 label(id="testNameParagraph", ng-bind="test.testName")
-                button(class="btn btn-default", ng-click="homeCtrl.startTest(test)", id="startTestButton") Pass
+                button(class="btn btn-default", ng-click="homeCtrl.startTest(test)", id="startTestButton", ng-show="test.passAvailable == 'yes'") Pass
                 label(id="testDateParagraph", ng-bind="homeCtrl.getFormattedDate(test.createdAt)")

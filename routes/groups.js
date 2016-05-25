@@ -1,18 +1,18 @@
-var express         = require('express');
-var router          = express.Router();
+var express             = require('express');
+var router              = express.Router();
 
 //logging
-var intel           = require('intel');
-var log             = require('../libs/log')('console', intel.DEBUG);
+var intel               = require('intel');
+var log                 = require('../libs/log')('console', intel.DEBUG);
 
 // database
-var ServerApplication = require('../libs/server-application');
-var User              = ServerApplication.defaultConnection.import('../models/user');
-var Group             = ServerApplication.defaultConnection.import('../models/group');
-var Test              = ServerApplication.defaultConnection.import('../models/test');
-var GroupHasTest      = ServerApplication.defaultConnection.import('../models/group_has_test');
+var ConnectionFabric    = require('../libs/connection-fabric');
+var User                = ConnectionFabric.defaultConnection.import('../models/user');
+var Group               = ConnectionFabric.defaultConnection.import('../models/group');
+var Test                = ConnectionFabric.defaultConnection.import('../models/test');
+var GroupHasTest        = ConnectionFabric.defaultConnection.import('../models/group_has_test');
 
-var sendResponse     = require('../libs/response-callback');
+var sendResponse        = require('../libs/response-callback');
 
 
 router.get('/',  function(req, res) {
@@ -89,11 +89,6 @@ router.get('/:id/tests',  function(req, res) {
                 idGroup: req.params.id
             }
         }).then(function(groupHasTests) {
-            if(groupHasTests.length == 0) {
-                res.code = 200;
-                res.json([]);
-                return;
-            }
             var idTests = [];
             for(var index in groupHasTests) {
                 idTests.push(groupHasTests[index].idTest);
@@ -103,8 +98,7 @@ router.get('/:id/tests',  function(req, res) {
                     idTest: idTests
                 }
             }).then(function(tests) {
-                res.json(
-                    {
+                res.json({
                         tests : tests
                     });
             }, function(err) {
@@ -118,7 +112,7 @@ router.get('/:id/tests',  function(req, res) {
     }, function(err) {
         log.error('Internal error(%d): %s', err.code, err.message);
         sendResponse(res, 500, 'Server error');
-    })
+    });
 
 });
 

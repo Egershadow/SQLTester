@@ -19,6 +19,8 @@ function HomeController (testService, $location, $filter) {
     };
 
     homeController.startTest = function (test) {
-        //testService
+
+        testsService.setCurrentTest(test);
+        //TODO:change current ng-view
     };
 }

@@ -1,0 +1,15 @@
+block header
+    div(class="nav nav-pills", id="homeNavigationBar")
+        h2 Sign in SQLTester
+        h5 Take credentials from your teacher.
+block body
+    div(ng-controller="TestController as testCtrl", class="panel panel-default", id="testsListContainer")
+        form(name="questionForm")
+            div(class="form-group")
+                label(class="col-sm-2 control-label", id="questionTextAreaLabel", ng-bind="testCtrl")
+            div(class="form-group")
+                label(class="col-sm-2 control-label", id="answerTextAreaLabel") Answer
+                textarea(rows="8", class="form-control", placeholder="SQL Request", ng-model="testCtrl", id="answerTextArea" required)
+            div(class="form-group")
+                button(class="btn btn-default", ng-click="testCtrl.showPreviousQuestion()", id="previousQuestionButton") "Show Previous"
+                button(class="btn btn-default", ng-click="testCtrl.showNextQuestion()", id="nextQuestionButton") "Show Next"

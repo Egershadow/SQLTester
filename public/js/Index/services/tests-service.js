@@ -4,10 +4,7 @@ angular.module('Index')
         var testsService = this;
 
             testsService.getTests = function (success, failure) {
-                //getting user info
-                var userProfile = userService.getUserProfile();
-
-                var testsUrl = BASE_DOMAIN + DEFAULT_API_URL + '/groups/' + userProfile.idGroup + '/tests';
+                var testsUrl = BASE_DOMAIN + DEFAULT_API_URL + '/users/me/tests';
 
                 $http.get(testsUrl, {
                     headers: {
@@ -37,12 +34,51 @@ angular.module('Index')
                 //});
             };
 
+            testsService.getQuestions = function (testId, success, failure) {
+                //request sending
+                var questionsUrl = BASE_DOMAIN + DEFAULT_API_URL + '/users/me/tests/' + testId + '/questions';
+
+                $http.get(questionsUrl, {
+                    headers: {
+                        'x-access-token': userService.getAccessToken()
+                    }
+                }).then(function (response) {
+                    //returning user
+                    success(response.data.tests);
+                }, function (response) {
+                    failure(response)
+                });
+            };
+
+            testsService.setUserInfo = function (success, failure) {
+                var testsUrl = BASE_DOMAIN + DEFAULT_API_URL + '/users/me/tests';
+
+                $http.get(testsUrl, {
+                    headers: {
+                        'x-access-token': userService.getAccessToken()
+                    }
+                }).then(function (response) {
+                    //returning user
+                    success(response.data.tests);
+                }, function (response) {
+                    failure(response)
+                });
+            };
+
             testsService.setUserInfo = function (userInfo) {
                 $cookies.put('userInfo', userInfo);
             };
 
             testsService.getUserInfo = function () {
                 return $cookies.get('userInfo');
+            };
+
+            testsService.getCurrentTest = function () {
+                return JSON.parse($cookies.get('currentTest'));
+            };
+
+            testsService.setCurrentTest = function (currentTest) {
+                $cookies.put('currentTest', JSON.stringify(currentTest));
             };
 
         }]);

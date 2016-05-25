@@ -2,7 +2,7 @@
 var express         = require('express');
 var config          = require('./libs/config');
 
-var path            = require('path'); // модуль для парсинга пути
+var path            = require('path');
 var bodyParser      = require('body-parser');
 var methodOverride  = require('method-override');
 
@@ -33,23 +33,29 @@ app.use(stylus.middleware(
     }
 ));
 app.use(express.static(__dirname + '/public'));
-//app.use(express.static(__dirname + '/views'));
-
 // used to create, sign, and verify tokens
 var port = process.env.PORT || 8080;
 
 var ConnectionFabric = require('./libs/connection-fabric');
 
-ConnectionFabric.establishDefaultConnection(function(sequelize) {
-    ServerApplication.defaultConnection = sequelize;
-    app.listen(config.get('port'), function () {
-        log.info('Express server listening on port %s', config.get('port'))
+ConnectionFabric.establishDefaultDBConnection( function (sequelize) {
+
+    ServerApplication.establishConnectionToSubjectDBs(function () {
+
+        //start listening of main port
+        app.listen(config.get('port'), function () {
+            log.info('Express server listening on port %s', config.get('port'));
+            ServerApplication.startListenPollingSocket();
+        });
+
+        //configuring routers
+        var routers = require('./routes/routers');
+        app.use('/', routers);
+    }, function (err) {
+        log.error('Subject dbs connecting error occurred:', err);
     });
-    //routers
-    var routers = require('./routes/routers');
-    app.use('/', routers);
 }, function(err) {
-    log.error('Unable to connect to the database:', err);
+    log.error('Unable to connect to main database:', err);
 });
 
 

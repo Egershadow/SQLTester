@@ -1,5 +1,8 @@
 {
   "port" : 1337,
+  "socketPort" : 8613,
+  "minutesForSingleQuestion" : 2,
+  "reconnectionWaitingMinutes" : 30,
   "mysql": {
     "username": "vadimvoytenko",
     "password": "humandetector",

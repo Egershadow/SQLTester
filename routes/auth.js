@@ -11,8 +11,8 @@ var intel           = require('intel');
 var log             = require('../libs/log')('console', intel.DEBUG);
 
 // database
-var ServerApplication = require('../libs/server-application');
-var User              = ServerApplication.defaultConnection.import('../models/user');
+var ConnectionFabric= require('../libs/connection-fabric');
+var User            = ConnectionFabric.defaultConnection.import('../models/user');
 
 var sendResponse     = require('../libs/response-callback');
 
@@ -45,7 +45,7 @@ router.post('/signin', function(req, res) {
         var tokenString = jwt.sign({
             idUser: user.idUser
         }, config.get('secret'), {
-            expiresIn: 60*60 // expires in 60 minutes
+            expiresIn: 60*60*24 // expires in 24 hours
         });
         //get user profile
         User.findById(user.idUser).then(function(user) {

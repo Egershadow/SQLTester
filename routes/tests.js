@@ -1,17 +1,17 @@
-var express         = require('express');
-var router          = express.Router();
-var config          = require('../libs/config');
+var express             = require('express');
+var router              = express.Router();
+var config              = require('../libs/config');
 
 //logging
-var intel           = require('intel');
-var log             = require('../libs/log')('console', intel.DEBUG);
+var intel               = require('intel');
+var log                 = require('../libs/log')('console', intel.DEBUG);
 
 // database
-var ServerApplication = require('../libs/server-application');
-var User              = ServerApplication.defaultConnection.import('../models/user');
-var Test              = ServerApplication.defaultConnection.import('../models/test');
+var ConnectionFabric    = require('../libs/connection-fabric');
+var User                = ConnectionFabric.defaultConnection.import('../models/user');
+var Test                = ConnectionFabric.defaultConnection.import('../models/test');
 
-var sendResponse     = require('../libs/response-callback');
+var sendResponse        = require('../libs/response-callback');
 
 
 router.get('/',  function(req, res) {

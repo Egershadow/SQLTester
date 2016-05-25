@@ -4,5 +4,5 @@ module.exports = function(res, code, message) {
     res.json({
         message: message
     })
-}
+};
 
