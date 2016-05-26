@@ -21,6 +21,6 @@ function HomeController (testService, $location, $filter) {
     homeController.startTest = function (test) {
 
         testsService.setCurrentTest(test);
-        //TODO:change current ng-view
+        $location.path('/test');
     };
 }

@@ -113,7 +113,19 @@ module.exports.getTestResult = function (idUser, idTest, startDate, success, fai
                     }
 
                     module.exports.calculateTestResult(rawTestData, function (result) {
-                        success(result);
+                        UserPassedTest.create(
+                            {
+                                testResult : result,
+                                idUser : idUser,
+                                idTest : idTest,
+                                date : new Date()
+
+                            }).then(function (userPassedTest) {
+                                success(result);
+                        }, function(err) {
+                            log.error('Internal error when creating camera(%d): %s', err.code, err.message);
+                            failure(err);
+                        });
                     });
                 }, function(err) {
                     failure(err);
@@ -211,6 +223,32 @@ module.exports.getQuestionsOfTest = function (idTest, success, failure) {
             }
         }
         success(questionData);
+    }, function(err) {
+        failure(err);
+    });
+};
+
+module.exports.getQuestionsImage = function (idQuestion, success, failure) {
+
+    var Question                = ConnectionFabric.defaultConnection.import('../models/question');
+    var SubjectDB               = ConnectionFabric.defaultConnection.import('../models/subject_db');
+    Question.findById(idQuestion).then(function(question) {
+
+        //getting subject db that contains schema image path
+        SubjectDB.findById(question.idSubjectDB).then(function(subjectDB) {
+
+            //reading image from storage
+            require('fs').readFile(subjectDB.imagePath, function(err, data) {
+                if (err) {
+                    log.error('Image reading fail:', err);
+                    failure(err);
+                } else {
+                    success(data);
+                }
+            });
+        }, function (err) {
+            failure(err);
+        });
     }, function(err) {
         failure(err);
     });

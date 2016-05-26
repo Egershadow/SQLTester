@@ -11,12 +11,16 @@ module.exports.onConnect = function (socket) {
         module.exports.onStartTest(socket, msg)
     });
 
-    socket.on('stoptest', function (msg) {
-        module.exports.onEndTest(socket, msg)
+    socket.on('finishtest', function (msg) {
+        module.exports.onFinishTest(socket, msg)
     });
 
     socket.on('sendanswer', function (msg) {
         module.exports.onAnswer(socket, msg)
+    });
+
+    socket.on('getimage', function (msg) {
+        module.exports.onGetImage(socket, msg)
     });
 };
 
@@ -35,9 +39,8 @@ module.exports.onStartTest = function (socket, msg) {
                 startDate : started,
                 timer : setTimeout(function() {
                     module.exports.finishTest(testAttempt.idUser, testAttempt.idTest, testAttempt.startDate, function (result) {
-                        socket.emit('testfinished', {
-                            result : result
-                        });
+
+                        socket.emit('testfinished', {});
                     }, function (error) {
                         socket.emit('testfinished', {
                             error : error
@@ -57,7 +60,7 @@ module.exports.onStartTest = function (socket, msg) {
     });
 };
 
-module.exports.onEndTest = function (socket, msg) {
+module.exports.onFinishTest = function (socket, msg) {
     var testAttempt = ServerApplication.networkConnections[socket.id.toString()];
     module.exports.finishTest(testAttempt.idUser, testAttempt.idTest, testAttempt.startDate, function (result) {
         socket.emit('testfinished', {
@@ -77,9 +80,20 @@ module.exports.onEndTest = function (socket, msg) {
 };
 
 module.exports.onAnswer = function (socket, msg) {
-
+    //TODO: Save answer to db
 };
 
 module.exports.finishTest = function (idUser, idTest, startDate, success, failure) {
     TestService.getTestResult(idUser, idTest, startDate, success, failure)
+};
+
+module.exports.onGetImage = function (socket, msg) {
+
+    TestService.getQuestionsImage(msg.idQuestion, function (imageData) {
+        socket.emit('imagereceived', {
+            image : imageData
+        });
+    }, function (err) {
+
+    });
 };
