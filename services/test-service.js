@@ -146,7 +146,7 @@ module.exports.getTestResult = function (idUser, idTest, startDate, success, fai
 module.exports.calculateTestResult = function (rawTestDate, result) {
 
     var resultValue = 0.0;
-    async.each(rawTestDate, function (testInfo, callback) {
+    async.eachSeries(rawTestDate, function (testInfo, callback) {
 
         //searching for key words
         var contains = true;
@@ -177,28 +177,84 @@ module.exports.calculateTestResult = function (rawTestDate, result) {
                         ServerApplication.subjectDBs[testInfo.question.idSubjectDB]
                             .connection.query(testInfo.userAnsweredQuestion.answerRequest).then(function (results) {
                             internalCallback(null, results);
+                        }, function (err) {
+                            internalCallback(null, null);
                         });
                     },
                     function(internalCallback){
                         ServerApplication.subjectDBs[testInfo.question.idSubjectDB]
                             .connection.query(testInfo.question.correctRequest).then(function (results) {
+
+                            //getting fetched data without meta
                             internalCallback(null, results);
+                        }, function (err) {
+                            internalCallback(null, null);
                         });
                     }
                 ],
                 function(err, results){
 
                     if(err) {
-                        log.error('Query chainer requests failed:', err);
+                        log.error('Query requests failed:', err);
                         callback();
                         return;
                     }
-                    //compare results
 
-                    //TODO: Implement comparation logic
-                    resultValue += rawTestDate.testHasQuestion.weight;
+                    //check if there are no sql errors, if they are, resultPair will contain only one value
+                    if(results[1] == undefined || results[1] == null) {
+                        callback();
+                        return;
+                    }
+
+                    //check if length of result arrays not equal
+                    if(results[0].length != results[1].length) {
+                        callback();
+                        return;
+                    }
+
+                    //comparing gotten results
+                    var equal = true;
+                    for(var i = 0; i < results[0].length; ++i) {
+                        var userAnsweredObject = results[0][0][i];
+                        var rightAnswerObject = results[1][0][i];
+
+                        //getting of property of answered object
+                        for(var userAnsweredIndex in userAnsweredObject) {
+                            var isPropertyEqual = false;
+                            if (userAnsweredObject.hasOwnProperty(userAnsweredIndex)) {
+
+                                //getting of property of right answer object
+                                for(var rightAnswerIndex in rightAnswerObject) {
+                                    if (rightAnswerObject.hasOwnProperty(rightAnswerIndex)) {
+
+                                        //check if there are property in both data sets
+                                        if(userAnsweredIndex == rightAnswerIndex) {
+
+                                            //check if values are equal of both properties
+                                            if(userAnsweredObject[userAnsweredIndex] == rightAnswerObject[rightAnswerIndex]) {
+                                                isPropertyEqual = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                if(!isPropertyEqual) {
+                                    equal = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if(!equal) {
+                            break;
+                        }
+                    }
+                    if(equal) {
+                        resultValue += testInfo.testHasQuestion.weight;
+                    }
                     callback();
                 });
+        } else {
+            callback();
         }
     }, function () {
 
@@ -278,7 +334,10 @@ module.exports.setAnswerToQuestionInTest = function (answer) {
     var UserAnsweredQuestion    = ConnectionFabric.defaultConnection.import('../models/user_answered_question');
     UserAnsweredQuestion.destroy( {
         where : {
-            idTestHasQuestion : answer.idTestHasQuestion
+            idTestHasQuestion : answer.idTestHasQuestion,
+            date : {
+                $gt : answer.date
+            }
         }
     }).then(function () {
         UserAnsweredQuestion.create(

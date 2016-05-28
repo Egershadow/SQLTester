@@ -33,11 +33,18 @@ module.exports.onStartTest = function (socket, msg) {
 
     TestService.getQuestionsOfTest(msg.test.idTest, function (questions) {
         TestService.getTimeForTest(msg.test.idTest, function (seconds) {
-            var started = new Date();
+            var now = new Date();
+            var year = now.getFullYear();
+            var month = now.getMonth();
+            var day = now.getDay();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var resSeconds = now.getSeconds();
+            
             var testAttempt = {
                 idTest : msg.test.idTest,
                 idUser : msg.test.idUser,
-                startDate : started,
+                startDate : year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + resSeconds,
                 timer : setTimeout(function() {
                     module.exports.finishTest(testAttempt.idUser, testAttempt.idTest, testAttempt.startDate, function (result) {
 

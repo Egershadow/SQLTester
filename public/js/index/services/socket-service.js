@@ -56,11 +56,18 @@ angular.module('Index')
             socketService.finishTest = function () {
                 socketService.socket.emit('finishtest', {});
             };
+            var now = new Date();
+            var year = now.getFullYear();
+            var month = now.getMonth();
+            var day = now.getDay();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var seconds = now.getSeconds();
 
             socketService.sendAnswer = function (answer) {
                 socketService.socket.emit('sendanswer', {
                     idTestHasQuestion : answer.idTestHasQuestion,
-                    date : new Date(),
+                    date : year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds,
                     answerRequest : answer.answerRequest,
                     idUser : userService.getUserProfile().idUser
                 });

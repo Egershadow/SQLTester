@@ -82,7 +82,6 @@ function TestController (testService, socketService, $location, userService) {
         } else {
             question.answer.previous = question.answer.answerRequest;
         }
-
         testController.questions[testController.currentIndex].answer = {
             idUser: userService.getUserProfile().idUser,
             answerRequest: testController.questions[testController.currentIndex].answer.answerRequest,
@@ -95,5 +94,3 @@ function TestController (testService, socketService, $location, userService) {
 
 
 }
-
-//SELECT * FROM Test WHERE idTest NOT IN (SELECT idTest From StudentPassedTest);
