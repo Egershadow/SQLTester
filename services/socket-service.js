@@ -81,7 +81,7 @@ module.exports.onFinishTest = function (socket, msg) {
 };
 
 module.exports.onAnswer = function (socket, msg) {
-    //TODO: Save answer to db
+    TestService.setAnswerToQuestionInTest(msg);
 };
 
 module.exports.finishTest = function (idUser, idTest, startDate, success, failure) {

@@ -57,6 +57,15 @@ angular.module('Index')
                 socketService.socket.emit('finishtest', {});
             };
 
+            socketService.sendAnswer = function (answer) {
+                socketService.socket.emit('sendanswer', {
+                    idTestHasQuestion : answer.idTestHasQuestion,
+                    date : new Date(),
+                    answerRequest : answer.answerRequest,
+                    idUser : userService.getUserProfile().idUser
+                });
+            };
+
             socketService.getImage = function (idQstion) {
                 socketService.socket.emit('getimage', {
                     idQuestion : idQstion

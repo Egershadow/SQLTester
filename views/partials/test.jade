@@ -3,14 +3,15 @@ block header
         h2 Sign in SQLTester
         h5 Take credentials from your teacher.
 block body
-    button(class="btn btn-default", ng-click="testCtrl.showPreviousQuestion()", id="finishTestButton") Finish Test
-    div(ng-controller="TestController as testCtrl", class="panel panel-default", id="testsListContainer")
-        form(name="questionForm")
-            img(class="img-thumbnail", ng-src="{{testCtrl.questions[testCtrl.currentIndex].imageData}}", id="questionImage")
-            div(class="form-group")
-                label(class="col-sm-2 control-label", id="questionTextAreaLabel", ng-bind="testCtrl.questions[testCtrl.currentIndex].questionText")
-            div(class="form-group")
-                textarea(rows="4", class="form-control", placeholder="SQL Request", ng-model="testCtrl.questions[testCtrl.currentIndex].answer", id="answerTextArea")
-            div(class="form-group")
-                button(class="btn btn-default", ng-click="testCtrl.showPreviousQuestion()", id="previousQuestionButton") Show Previous
-                button(class="btn btn-default", ng-click="testCtrl.showNextQuestion()", id="nextQuestionButton") Show Next
+    div(ng-controller="TestController as testCtrl")
+        button(class="btn btn-default", ng-click="testCtrl.finishTest()", id="finishTestButton") Finish Test
+        div(class="panel panel-default", id="testsListContainer")
+            form(name="questionForm")
+                img(class="img-thumbnail", ng-src="{{testCtrl.questions[testCtrl.currentIndex].imageData}}", id="questionImage")
+                div(class="form-group")
+                    label(class="col-sm-2 control-label", id="questionTextAreaLabel", ng-bind="testCtrl.questions[testCtrl.currentIndex].questionText")
+                div(class="form-group")
+                    textarea(rows="4", class="form-control", placeholder="SQL Request", ng-model="testCtrl.questions[testCtrl.currentIndex].answer.answerRequest", id="answerTextArea")
+                div(class="form-group")
+                    button(class="btn btn-default", ng-click="testCtrl.showPreviousQuestion()", id="previousQuestionButton") Show Previous
+                    button(class="btn btn-default", ng-click="testCtrl.showNextQuestion()", id="nextQuestionButton") Show Next

@@ -52,9 +52,11 @@ module.exports.getTestResult = function (idUser, idTest, startDate, success, fai
             }
         }).then(function(testHasQuestions) {
             var idQuestions = [];
+            var idTestHasQuestions = [];
             for(var index in testHasQuestions) {
                 if (testHasQuestions.hasOwnProperty(index)) {
                     idQuestions.push(testHasQuestions[index].idQuestion);
+                    idTestHasQuestions.push(testHasQuestions[index].idTestHasQuestion)
                 }
             }
             Question.findAll({
@@ -65,7 +67,7 @@ module.exports.getTestResult = function (idUser, idTest, startDate, success, fai
                 //check if user passes test first time
                 var whereParams = {
                     idUser : idUser,
-                    idTest : idTest
+                    idTestHasQuestion : idTestHasQuestions
                 };
                 if(userPassedTests.length > 0) {
                     whereParams.date =  {
@@ -227,10 +229,18 @@ module.exports.getQuestionsOfTest = function (idTest, success, failure) {
             var questionData = [];
             for (var questionIndex in questions) {
                 if (questions.hasOwnProperty(questionIndex)) {
-                    questionData.push({
-                        questionText : questions[questionIndex].questionText,
-                        idQuestion : questions[questionIndex].idQuestion
-                    });
+                    for (var indexTestHasQuestion in testHasQuestions) {
+                        if (testHasQuestions.hasOwnProperty(indexTestHasQuestion)) {
+                            if (testHasQuestions[indexTestHasQuestion].idQuestion == questions[questionIndex].idQuestion) {
+                                questionData.push({
+                                    questionText: questions[questionIndex].questionText,
+                                    idQuestion: questions[questionIndex].idQuestion,
+                                    idTestHasQuestion: testHasQuestions[indexTestHasQuestion].idTestHasQuestion
+                                });
+                                break;
+                            }
+                        }
+                    }
                 }
             }
             success(questionData);
@@ -241,32 +251,6 @@ module.exports.getQuestionsOfTest = function (idTest, success, failure) {
         failure(err);
     });
 };
-
-//module.exports.getQuestionsImage = function (idQuestion, success, failure) {
-//
-//    var Question                = ConnectionFabric.defaultConnection.import('../models/question');
-//    var SubjectDB               = ConnectionFabric.defaultConnection.import('../models/subject_db');
-//    Question.findById(idQuestion).then(function(question) {
-//
-//        //getting subject db that contains schema image path
-//        SubjectDB.findById(question.idSubjectDB).then(function(subjectDB) {
-//
-//            //reading image from storage
-//            require('fs').readFile(subjectDB.imagePath, function(err, data) {
-//                if (err) {
-//                    log.error('Image reading fail:', err);
-//                    failure(err);
-//                } else {
-//                    success(new Buffer(data).toString('base64'));
-//                }
-//            });
-//        }, function (err) {
-//            failure(err);
-//        });
-//    }, function(err) {
-//        failure(err);
-//    });
-//};
 
 module.exports.getQuestionsImage = function (idQuestion, success, failure) {
 
@@ -286,6 +270,29 @@ module.exports.getQuestionsImage = function (idQuestion, success, failure) {
         });
     }, function(err) {
         failure(err);
+    });
+};
+
+module.exports.setAnswerToQuestionInTest = function (answer) {
+
+    var UserAnsweredQuestion    = ConnectionFabric.defaultConnection.import('../models/user_answered_question');
+    UserAnsweredQuestion.destroy( {
+        where : {
+            idTestHasQuestion : answer.idTestHasQuestion
+        }
+    }).then(function () {
+        UserAnsweredQuestion.create(
+            {
+                idTestHasQuestion : answer.idTestHasQuestion,
+                date : answer.date,
+                answerRequest : answer.answerRequest,
+                idUser : answer.idUser
+
+            }).then(function (userAnsweredQuestion) {
+            var i = 228;
+        }, function(err) {
+            log.error('Answer creation error(%d): %s', err.code, err.message);
+        });
     });
 };
 
