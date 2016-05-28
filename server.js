@@ -15,6 +15,13 @@ var stylus          = require('stylus');
 var nib             = require('nib');
 var ServerApplication = require('./libs/server-application');
 
+//removing of test dbs
+
+const fs = require('fs');
+
+fs.unlinkSync('/Users/vadimvoytenko/Desktop/dev/University/SQLTester/clinic.sqlite');
+fs.unlinkSync('/Users/vadimvoytenko/Desktop/dev/University/SQLTester/university.sqlite');
+
 app.use(bodyParser.urlencoded({
     extended: true
 }));

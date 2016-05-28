@@ -26,12 +26,13 @@ module.exports.onConnect = function (socket) {
 
 module.exports.onDisconnect = function () {
     //clear existing socket from app list
+    var i = 25;
 };
 
 module.exports.onStartTest = function (socket, msg) {
 
-    TestService.getQuestionsOfTest(msg.idTest, function (questions) {
-        TestService.getTimeForTest(msg.idTest, function (seconds) {
+    TestService.getQuestionsOfTest(msg.test.idTest, function (questions) {
+        TestService.getTimeForTest(msg.test.idTest, function (seconds) {
             var started = new Date();
             var testAttempt = {
                 idTest : msg.test.idTest,
@@ -87,10 +88,12 @@ module.exports.finishTest = function (idUser, idTest, startDate, success, failur
     TestService.getTestResult(idUser, idTest, startDate, success, failure)
 };
 
+
 module.exports.onGetImage = function (socket, msg) {
 
     TestService.getQuestionsImage(msg.idQuestion, function (imageData) {
         socket.emit('imagereceived', {
+            idQuestion : msg.idQuestion,
             image : imageData
         });
     }, function (err) {

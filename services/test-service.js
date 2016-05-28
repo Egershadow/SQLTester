@@ -12,7 +12,7 @@ var log             = require('../libs/log')('console', intel.DEBUG);
 
 module.exports.getTimeForTest = function (idTest, success, failure) {
 
-    var TestHasQuestion         = ConnectionFabric.defaultConnection.import('../models/test-has-question');
+    var TestHasQuestion         = ConnectionFabric.defaultConnection.import('../models/test_has_question');
 
     TestHasQuestion.findAll({
         where: {
@@ -25,7 +25,7 @@ module.exports.getTimeForTest = function (idTest, success, failure) {
             return;
         }
         //calculating of total time for test in seconds
-        var totalTime = TestHasQuestion.length * config.get('minutesForSingleQuestion') * 60;
+        var totalTime = testHasQuestions.length * config.get('minutesForSingleQuestion') * 60;
 
         success(totalTime);
     }, function(err) {
@@ -35,9 +35,9 @@ module.exports.getTimeForTest = function (idTest, success, failure) {
 
 module.exports.getTestResult = function (idUser, idTest, startDate, success, failure) {
 
-    var TestHasQuestion         = ConnectionFabric.defaultConnection.import('../models/test-has-question');
-    var UserPassedTest          = ConnectionFabric.defaultConnection.import('../models/user-passed-test');
-    var UserAnsweredQuestion    = ConnectionFabric.defaultConnection.import('../models/user-answered-question');
+    var TestHasQuestion         = ConnectionFabric.defaultConnection.import('../models/test_has_question');
+    var UserPassedTest          = ConnectionFabric.defaultConnection.import('../models/user_passed_test');
+    var UserAnsweredQuestion    = ConnectionFabric.defaultConnection.import('../models/user_answered_question');
     var Question                = ConnectionFabric.defaultConnection.import('../models/question');
 
     UserPassedTest.findAll({
@@ -205,28 +205,68 @@ module.exports.calculateTestResult = function (rawTestDate, result) {
 };
 
 module.exports.getQuestionsOfTest = function (idTest, success, failure) {
-
-    var Question                = ConnectionFabric.defaultConnection.import('../models/question');
-    Question.findAll({
+    var TestHasQuestion                = ConnectionFabric.defaultConnection.import('../models/test_has_question');
+    TestHasQuestion.findAll({
         where: {
             idTest : idTest
         }
-    }).then(function(questions) {
-
-        var questionData = [];
-        for (var questionIndex in questions) {
-            if (questions.hasOwnProperty(questionIndex)) {
-                questionData.push({
-                    questionText : questions[questionIndex].questionText,
-                    idQuestion : questions[questionIndex].idQuestion
-                });
+    }).then(function(testHasQuestions) {
+        var idQuestions = [];
+        for(var index in testHasQuestions) {
+            if (testHasQuestions.hasOwnProperty(index)) {
+                idQuestions.push(testHasQuestions[index].idQuestion);
             }
         }
-        success(questionData);
-    }, function(err) {
+        var Question                = ConnectionFabric.defaultConnection.import('../models/question');
+        Question.findAll( {
+            where : {
+                idQuestion : idQuestions
+            }
+        }).then(function(questions) {
+
+            var questionData = [];
+            for (var questionIndex in questions) {
+                if (questions.hasOwnProperty(questionIndex)) {
+                    questionData.push({
+                        questionText : questions[questionIndex].questionText,
+                        idQuestion : questions[questionIndex].idQuestion
+                    });
+                }
+            }
+            success(questionData);
+        }, function(err) {
+            failure(err);
+        });
+    }, function (err) {
         failure(err);
     });
 };
+
+//module.exports.getQuestionsImage = function (idQuestion, success, failure) {
+//
+//    var Question                = ConnectionFabric.defaultConnection.import('../models/question');
+//    var SubjectDB               = ConnectionFabric.defaultConnection.import('../models/subject_db');
+//    Question.findById(idQuestion).then(function(question) {
+//
+//        //getting subject db that contains schema image path
+//        SubjectDB.findById(question.idSubjectDB).then(function(subjectDB) {
+//
+//            //reading image from storage
+//            require('fs').readFile(subjectDB.imagePath, function(err, data) {
+//                if (err) {
+//                    log.error('Image reading fail:', err);
+//                    failure(err);
+//                } else {
+//                    success(new Buffer(data).toString('base64'));
+//                }
+//            });
+//        }, function (err) {
+//            failure(err);
+//        });
+//    }, function(err) {
+//        failure(err);
+//    });
+//};
 
 module.exports.getQuestionsImage = function (idQuestion, success, failure) {
 
@@ -237,15 +277,10 @@ module.exports.getQuestionsImage = function (idQuestion, success, failure) {
         //getting subject db that contains schema image path
         SubjectDB.findById(question.idSubjectDB).then(function(subjectDB) {
 
-            //reading image from storage
-            require('fs').readFile(subjectDB.imagePath, function(err, data) {
-                if (err) {
-                    log.error('Image reading fail:', err);
-                    failure(err);
-                } else {
-                    success(data);
-                }
-            });
+            var image = subjectDB.imagePath.substring(subjectDB.imagePath.lastIndexOf('/') + 1);
+
+            success(image);
+
         }, function (err) {
             failure(err);
         });

@@ -165,11 +165,25 @@ content {
   height: 30px;
   width: 75px;
 }
+#nextQuestionButton {
+  float: right;
+  margin-right: 0px;
+}
 #testsListContainer {
-  margin-top: 100px;
+  margin-top: 50px;
   width: 500px;
   margin-right: auto;
   margin-left: auto;
+}
+#questionTextAreaLabel {
+  margin-top: 20px;
+  width: 100%;
+}
+#finishTestButton {
+  float: right;
+  margin: 20px;
+  color: #fff;
+  background-color: rgba(9,115,14,0.43);
 }
 footer {
   text-align: center;

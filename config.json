@@ -1,6 +1,7 @@
 {
   "port" : 1337,
-  "socketAddress" : "http://127.0.0.1:8613",
+  "socketPort" : 8613,
+  "socketAddress" : "http://localhost:8613",
   "minutesForSingleQuestion" : 2,
   "reconnectionWaitingMinutes" : 30,
   "mysql": {

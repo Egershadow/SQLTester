@@ -38,7 +38,7 @@ router.get('/:id',  function(req, res) {
                     idUser : user.idUser,
                     email : user.email,
                     username : user.username,
-                    idGroup : user.group
+                    idGroup : user.idGroup
                 }
             };
             res.json(userProfile);
@@ -108,26 +108,34 @@ router.get('/:id/tests/:testId/questions',  function(req, res) {
 
 router.get('/:id/tests',  function(req, res) {
 
-    User.findById(req.params.id).then(function(user) {
+    var userId = req.params.id;
+    if(userId == 'me') {
+        userId = req.decoded.idUser;
+    }
+
+    User.findById(userId).then(function(user) {
         if(!user) {
             sendResponse(res, 400, 'User with passed id not found');
         } else {
             UserPassedTest.findAll({
                 where: {
-                    idUser : req.params.id
+                    idUser : userId
                 }
             }).then(function(userPassedTests) {
                 var idTests = [];
                 for(var index in userPassedTests) {
                     idTests.push(userPassedTests[index].idTest);
                 }
-                GroupHasTest.findAll({
-                    where: {
-                        idGroup : user.group,
-                        idTest : {
-                            $notIn : idTests
-                        }
+                var groupHasTestCondition = {
+                    idGroup : user.idGroup,
+                };
+                if(idTests.length > 0) {
+                    groupHasTestCondition.idTest = {
+                        $notIn : idTests
                     }
+                }
+                GroupHasTest.findAll({
+                    where: groupHasTestCondition
                 }).then(function(groupHasTests) {
                     for(var index in groupHasTests) {
                         if(!idTests.indexOf(groupHasTests[index].idTest) != -1) {

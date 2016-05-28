@@ -35,5 +35,8 @@ router.use('/groups', groups);
 var users = require('./users');
 router.use('/users', users);
 
+var sockets = require('./sockets');
+router.use('/sockets', sockets);
+
 
 module.exports = router;

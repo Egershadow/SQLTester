@@ -1,5 +1,5 @@
 angular.module('Index')
-    .service('socketService', ['BASE_DOMAIN', 'DEFAULT_API_URL', '$http', userService,
+    .service('socketService', ['BASE_DOMAIN', 'DEFAULT_API_URL', '$http', 'userService',
         function(BASE_DOMAIN, DEFAULT_API_URL, $http, userService) {
             var socketService = this;
 
@@ -16,21 +16,25 @@ angular.module('Index')
 
                     //establishing connection to server
                     socketService.socket = io.connect(response.data.socket, {
-                        'reconnect': true,
-                        'reconnection delay': 500,
-                        'max reconnection attempts': 10
+                        //'reconnect': true,
+                        //'reconnection delay': 500,
+                        //'max reconnection attempts': 10
+                    });
+
+                    socketService.socket.on('connect_error', function(err){
+                        console.log('Connection Failed');
                     });
 
                     socketService.socket.on('teststarted', function (msg) {
-                        socketService.delegate.onTestStarted(socket, msg);
+                        socketService.delegate.onTestStarted(socketService.socket, msg);
                     });
 
                     socketService.socket.on('testfinished', function (msg) {
-                        socketService.delegate.onTestFinished(socket, msg);
+                        socketService.delegate.onTestFinished(socketService.socket, msg);
                     });
 
                     socketService.socket.on('imagereceived', function (msg) {
-                        socketService.delegate.onImageReceived(socket, msg);
+                        socketService.delegate.onImageReceived(socketService.socket, msg);
                     });
 
                     //returning socket to user
@@ -41,7 +45,7 @@ angular.module('Index')
             };
 
             socketService.startTest = function (test) {
-                socket.emit('starttest', {
+                socketService.socket.emit('starttest', {
                     test : {
                         idTest : test.idTest,
                         idUser : userService.getUserProfile().idUser
@@ -50,12 +54,12 @@ angular.module('Index')
             };
 
             socketService.finishTest = function () {
-                socket.emit('finishtest', {});
+                socketService.socket.emit('finishtest', {});
             };
 
-            socketService.getImage = function (idQuestion) {
-                socket.emit('getimage', {
-                    idQuestion : idQuestion
+            socketService.getImage = function (idQstion) {
+                socketService.socket.emit('getimage', {
+                    idQuestion : idQstion
                 });
             };
 
