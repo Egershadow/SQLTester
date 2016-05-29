@@ -26,4 +26,19 @@ angular.module('Index')
                 $cookies.put('currentTest', JSON.stringify(currentTest));
             };
 
+            testsService.getResult = function (test, success, failure) {
+                var resultsUrl = BASE_DOMAIN + DEFAULT_API_URL + '/users/me/tests/' + test.idTest + '/results';
+
+                $http.get(resultsUrl, {
+                    headers: {
+                        'x-access-token': userService.getAccessToken()
+                    }
+                }).then(function (response) {
+                    //returning user
+                    success(response.data.result);
+                }, function (response) {
+                    failure(response)
+                });
+            };
+
         }]);

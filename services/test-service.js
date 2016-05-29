@@ -163,9 +163,14 @@ module.exports.calculateTestResult = function (rawTestDate, result) {
 
         for (var keyWord in parsedKeyWords) {
             if (parsedKeyWords.hasOwnProperty(keyWord)) {
-                if(testInfo.userAnsweredQuestion.answerRequest.indexOf(parsedKeyWords[keyWord]) == -1) {
-                    contains = false;
-                    break;
+                if(testInfo.userAnsweredQuestion != undefined) {
+                    if(testInfo.userAnsweredQuestion.answerRequest.indexOf(parsedKeyWords[keyWord]) == -1) {
+                        contains = false;
+                        break;
+                    }
+                } else {
+                    callback();
+                    return;
                 }
             }
         }
@@ -329,30 +334,57 @@ module.exports.getQuestionsImage = function (idQuestion, success, failure) {
     });
 };
 
-module.exports.setAnswerToQuestionInTest = function (answer) {
+module.exports.setAnswerToQuestionInTest = function (answer, idUser, idTest) {
 
     var UserAnsweredQuestion    = ConnectionFabric.defaultConnection.import('../models/user_answered_question');
-    UserAnsweredQuestion.destroy( {
-        where : {
-            idTestHasQuestion : answer.idTestHasQuestion,
-            date : {
-                $gt : answer.date
-            }
-        }
-    }).then(function () {
-        UserAnsweredQuestion.create(
-            {
-                idTestHasQuestion : answer.idTestHasQuestion,
-                date : answer.date,
-                answerRequest : answer.answerRequest,
-                idUser : answer.idUser
+    var UserPassedTest          = ConnectionFabric.defaultConnection.import('../models/user_passed_test');
 
-            }).then(function (userAnsweredQuestion) {
-            var i = 228;
-        }, function(err) {
-            log.error('Answer creation error(%d): %s', err.code, err.message);
-        });
+    UserPassedTest.findAll({
+        where : {
+            idUser : idUser,
+            idTest : idTest
+        }
+    }).then(function(userPassedTests) {
+        if(userPassedTests.length > 0) {
+            UserAnsweredQuestion.destroy( {
+                where : {
+                    idTestHasQuestion : answer.idTestHasQuestion,
+                    date : {
+                        $gt : userPassedTests[0].date
+                    }
+                }
+            }).then(function () {
+                UserAnsweredQuestion.create(
+                    {
+                        idTestHasQuestion : answer.idTestHasQuestion,
+                        date : answer.date,
+                        answerRequest : answer.answerRequest,
+                        idUser : answer.idUser
+
+                    }).then(function (userAnsweredQuestion) {
+                    var i = 228;
+                }, function(err) {
+                    log.error('Answer creation error(%d): %s', err.code, err.message);
+                });
+            });
+        } else {
+            UserAnsweredQuestion.create(
+                {
+                    idTestHasQuestion : answer.idTestHasQuestion,
+                    date : answer.date,
+                    answerRequest : answer.answerRequest,
+                    idUser : answer.idUser
+
+                }).then(function (userAnsweredQuestion) {
+                var i = 228;
+            }, function(err) {
+                log.error('Answer creation error(%d): %s', err.code, err.message);
+            });
+        }
+    }, function (err) {
+        log.error('Internal error(%d): %s', err.code, err.message);
     });
+
 };
 
 

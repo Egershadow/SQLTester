@@ -58,7 +58,8 @@ function TestController (testService, socketService, $location, userService) {
     };
 
     testController.onTestFinished = function (socket, msg) {
-        $location.path('/results');
+        $location.path('/result');
+        $route.reload();
     };
 
     testController.downloadImageIfNeeded = function () {

@@ -59,15 +59,21 @@ angular.module('Index')
             var now = new Date();
             var year = now.getFullYear();
             var month = now.getMonth();
+            //month = ("0" + month).slice(-2);
             var day = now.getDay();
+            //day = ("0" + day).slice(-2);
             var hours = now.getHours();
+            //var hours = '23';
+            //hours = ("0" + hours).slice(-2);
             var minutes = now.getMinutes();
+            //minutes = ("0" + minutes).slice(-2);
             var seconds = now.getSeconds();
+            //seconds = ("0" + seconds).slice(-2);
 
             socketService.sendAnswer = function (answer) {
                 socketService.socket.emit('sendanswer', {
                     idTestHasQuestion : answer.idTestHasQuestion,
-                    date : year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds,
+                    date : now,//year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds,
                     answerRequest : answer.answerRequest,
                     idUser : userService.getUserProfile().idUser
                 });

@@ -1,0 +1,12 @@
+block header
+    div(class="nav nav-pills", id="homeNavigationBar")
+        h2 Sign in SQLTester
+        h5 Take credentials from your teacher.
+block body
+    div(ng-controller="ResultController as resCtrl")
+        div(class="panel panel-default", id="resultPanel")
+            div(class="form-group")
+                label(class="col-sm-2 control-label", id="resultAreaLabel", ng-bind="resCtrl.result")
+            div(class="form-group")
+                label(class="col-sm-2 control-label", id="resultMessageLabel", ng-bind="resCtrl.resultMessage")
+                button(class="btn btn-default", ng-click="resCtrl.goHome()", id="signInButton") Go Home

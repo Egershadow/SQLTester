@@ -13,6 +13,6 @@ module.exports = function(sequelize, DataTypes) {
 
         idTestHasQuestion : {type: DataTypes.INTEGER, primaryKey: true},
 
-        date: {primaryKey: true, type: DataTypes.DATE, allowNull: false, unique: false, defaultValue: sequelize.NOW}
+        date: {primaryKey: true, type: DataTypes.DATE, allowNull: false, defaultValue: sequelize.NOW}
     })
 };

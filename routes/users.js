@@ -49,6 +49,34 @@ router.get('/:id',  function(req, res) {
     });
 });
 
+router.get('/:idTest/tests/:idTest/results',  function(req, res) {
+    var userId = 0;
+    if(req.params.id == 'me') {
+        userId = req.decoded.idUser;
+    } else {
+        userId = req.params.id;
+    }
+    UserPassedTest.findAll({
+        where : {
+            idUser : userId,
+            idTest : req.params.idTest
+        }
+    }).then(function(userPassedTest) {
+        if(!userPassedTest) {
+            sendResponse(res, 400, 'User with passed id not found');
+        } else {
+            var userProfile = {
+                result : userPassedTest.testResult
+            };
+            res.json(userProfile);
+        }
+    }, function(err) {
+        log.error('Internal error(%d): %s', err.code, err.message);
+        sendResponse(res, 500, 'Server error')
+    });
+});
+
+
 router.get('/:id/tests/:testId/questions',  function(req, res) {
     var userId = 0;
     if(req.params.id == 'me') {
@@ -91,11 +119,11 @@ router.get('/:id/tests/:testId/questions',  function(req, res) {
                     });
 
                     res.json(questions);
-                }, function (error) {
+                }, function (err) {
                     log.error('Internal error(%d): %s', err.code, err.message);
                     sendResponse(res, 500, 'Server error')
                 });
-            }, function(error) {
+            }, function(err) {
                 log.error('Internal error(%d): %s', err.code, err.message);
                 sendResponse(res, 500, 'Server error')
             });
