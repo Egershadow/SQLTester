@@ -1,14 +1,36 @@
 angular.module('Index')
     .controller('TestController', TestController);
 
-TestController.$inject = ['testsService', 'socketService', '$location', 'userService', '$scope'];
+TestController.$inject = ['testsService', 'socketService', '$location', 'userService', '$scope', '$timeout'];
 
-function TestController (testService, socketService, $location, userService, $scope) {
+function TestController (testService, socketService, $location, userService, $scope, $timeout) {
     var testController = this;
 
     testController.questions = [];
     testController.currentIndex = 0;
     socketService.delegate = testController;
+
+    testController.minutes = 0;
+    testController.seconds = 0;
+    testController.onTimeout = function(){
+        if(testController.seconds == 0 && testController.minutes == 0) {
+            return;
+        }
+        if(testController.seconds == 0 && testController.minutes > 0) {
+            testController.seconds = 59;
+            testController.minutes--;
+        } else {
+            testController.seconds--;
+        }
+        //testController.seconds--;
+        //if(testController.seconds == 59) {
+        //    if(testController.minutes > 0) {
+        //        testController.minutes--;
+        //    }
+        //}
+        mytimeout = $timeout(testController.onTimeout,1000);
+    };
+    var mytimeout = $timeout(testController.onTimeout,1000);
 
     socketService.establishConnectionToSocket(function (socket) {
         socketService.startTest(testService.getCurrentTest());
@@ -38,12 +60,16 @@ function TestController (testService, socketService, $location, userService, $sc
     };
 
     testController.onTestStarted = function (socket, msg) {
-        testController.questions = msg.questions;
-        for(var i = 0; i < testController.questions[i]; ++i) {
-            testController.questions[i].answer = {
-                previous : ''
-            };
-        }
+        $scope.$apply(function(){
+            testController.questions = msg.questions;
+            for(var i = 0; i < testController.questions[i]; ++i) {
+                testController.questions[i].answer = {
+                    previous : ''
+                };
+            }
+            testController.minutes = msg.minutes;
+            testController.seconds = msg.seconds;
+        });
         socketService.getImage(testController.questions[testController.currentIndex].idQuestion);
     };
 

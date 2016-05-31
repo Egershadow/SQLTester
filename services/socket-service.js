@@ -68,6 +68,8 @@ module.exports.onStartTest = function (socket, msg) {
             ServerApplication.networkConnections[socket.id.toString()] = testAttempt;
             socket.emit('teststarted', {
                 started : now,
+                minutes : seconds/ 60,
+                seconds : seconds % minutes,
                 questions : questions
             });
         }, function (err) {
