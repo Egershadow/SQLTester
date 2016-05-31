@@ -9,17 +9,17 @@ function ResultController (testsService, $location) {
 
     resultController.resultMessage = '';
     resultController.result = 0;
-    resultController.getResultOfCurrentTest = function () {
-        var currentTest = testsService.getCurrentTest();
-        testsService.getResult(currentTest, function (result) {
-            resultController.result = result;
-            if(resultController.result > 60) {
-                resultController.resultMessage = 'Success!\nTest passed successfully!';
-            }
-        }, function (err) {
+    var currentTest = testsService.getCurrentTest();
+    testsService.getResult(currentTest, function (result) {
+        resultController.result = result;
+        if(resultController.result > 60) {
+            resultController.resultMessage = 'Success!\nTest passed successfully!';
+        } else {
+            resultController.resultMessage = 'Failure!\nTest not passed!';
+        }
+    }, function (err) {
 
-        })
-    };
+    });
 
     resultController.goHome = function () {
 

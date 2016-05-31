@@ -1,9 +1,9 @@
 angular.module('Index')
     .controller('TestController', TestController);
 
-TestController.$inject = ['testsService', 'socketService', '$location', 'userService'];
+TestController.$inject = ['testsService', 'socketService', '$location', 'userService', '$scope'];
 
-function TestController (testService, socketService, $location, userService) {
+function TestController (testService, socketService, $location, userService, $scope) {
     var testController = this;
 
     testController.questions = [];
@@ -48,18 +48,21 @@ function TestController (testService, socketService, $location, userService) {
     };
 
     testController.onImageReceived = function (socket, msg) {
+        $scope.$apply(function(){
 
-        //setting of image data source property to certain question
-        for(var i = 0; i < testController.questions.length; ++i) {
-            if (testController.questions[i].idQuestion == msg.idQuestion) {
-                testController.questions[i].imageData = 'images/' + msg.image;
+            //setting of image data source property to certain question
+            for(var i = 0; i < testController.questions.length; ++i) {
+                if (testController.questions[i].idQuestion == msg.idQuestion) {
+                    testController.questions[i].imageData = 'images/' + msg.image;
+                }
             }
-        }
+        });
     };
 
     testController.onTestFinished = function (socket, msg) {
-        $location.path('/result');
-        $route.reload();
+        $scope.$apply(function(){
+            $location.path('/result');
+        });
     };
 
     testController.downloadImageIfNeeded = function () {
@@ -69,6 +72,8 @@ function TestController (testService, socketService, $location, userService) {
     };
 
     testController.sendAnswerToCurrentQuestion = function () {
+
+
         var question = testController.questions[testController.currentIndex];
         if (question.answer == undefined || question.answer.answerRequest == undefined) {
             return;

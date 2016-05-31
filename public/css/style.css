@@ -186,6 +186,41 @@ content {
   color: #fff;
   background-color: rgba(9,115,14,0.43);
 }
+#goHomeButton {
+  margin-top: 10px;
+  width: 100%;
+  height: 50px;
+  color: #fff;
+  font-size: 16px;
+  background-color: rgba(9,115,14,0.43);
+}
+#resultPanel {
+  width: 500px;
+}
+#resultButton {
+  margin-top: -10px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 30%;
+  height: 40px;
+  color: #fff;
+  font-size: 16px;
+  background-color: rgba(9,115,14,0.43);
+  float: left;
+}
+#resultLabel {
+  margin-top: 10px;
+  margin-left: auto;
+}
+#resultMessageLabel {
+  margin-left: auto;
+  margin-right: auto;
+}
+#testTimeout {
+  float: right;
+  margin-right: 20px;
+  margin-top: -30px;
+}
 footer {
   text-align: center;
   width: 90%;

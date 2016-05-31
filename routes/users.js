@@ -49,12 +49,12 @@ router.get('/:id',  function(req, res) {
     });
 });
 
-router.get('/:idTest/tests/:idTest/results',  function(req, res) {
+router.get('/:idUser/tests/:idTest/results',  function(req, res) {
     var userId = 0;
-    if(req.params.id == 'me') {
+    if(req.params.idUser == 'me') {
         userId = req.decoded.idUser;
     } else {
-        userId = req.params.id;
+        userId = req.params.idUser;
     }
     UserPassedTest.findAll({
         where : {
@@ -66,9 +66,9 @@ router.get('/:idTest/tests/:idTest/results',  function(req, res) {
             sendResponse(res, 400, 'User with passed id not found');
         } else {
             var userProfile = {
-                result : userPassedTest.testResult
+                result : userPassedTest[0].testResult
             };
-            res.json(userProfile);
+            res.send(userProfile);
         }
     }, function(err) {
         log.error('Internal error(%d): %s', err.code, err.message);
